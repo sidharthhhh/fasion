@@ -1,27 +1,47 @@
+import "locomotive-scroll/dist/locomotive-scroll.css";
+
+import { AnimatePresence } from "framer-motion";
+import { useRef, useState, useEffect } from "react";
+import { LocomotiveScrollProvider } from "react-locomotive-scroll";
 import { ThemeProvider } from "styled-components";
-import GlobalStyles from "./styles/GlobalStyles"
-import { dark } from "./styles/Themes";
-import { LocomotiveScrollProvider } from 'react-locomotive-scroll'
-import { useRef } from "react";
-import 'locomotive-scroll/dist/locomotive-scroll.css'
+
+import Loader from "./components/Loader";
+import ScrollTriggerProxy from "./components/ScrollTriggerProxy";
+import About from "./sections/About";
+import Footer from "./sections/Footer";
 import Home from "./sections/Home";
+import Marquee from "./sections/Marquee";
+import NewArrival from "./sections/NewArrival";
+import Shop from "./sections/Shop";
+import GlobalStyles from "./styles/GlobalStyles";
+import { dark } from "./styles/Themes";
 
 function App() {
+  // useLocoScroll();
+  const containerRef = useRef(null);
+  const [Loaded, setLoaded] = useState(false);
 
-  const containerRef = useRef(null)
+  useEffect(() => {
+    setTimeout(() => {
+      setLoaded(true);
+    }, 3000);
+  }, []);
 
   return (
-    <div className="App">
+    <>
       <GlobalStyles />
       <ThemeProvider theme={dark}>
-       
         <LocomotiveScrollProvider
-          options={
-            {
+          options={{
+            smooth: true,
+            // ... all available Locomotive Scroll instance options
+            smartphone: {
               smooth: true,
-              // ... all available Locomotive Scroll instance options 
-            }
-          }
+            },
+            tablet: {
+              smooth: true,
+            },
+          }}
           watch={
             [
               //..all the dependencies you want to watch to update the scroll.
@@ -31,12 +51,23 @@ function App() {
           }
           containerRef={containerRef}
         >
-          <main data-scroll-container ref={containerRef}>
-           <Home />
+          <AnimatePresence>{Loaded ? null : <Loader />}</AnimatePresence>
+          <main className="App" data-scroll-container ref={containerRef}>
+            <ScrollTriggerProxy />
+            <AnimatePresence>
+              {Loaded ? null : <Loader />}
+
+              <Home key="home" />
+              <About key="about" />
+              <Shop key="Shop" />
+              <Marquee key="marquee" />
+              <NewArrival key="new arrival" />
+              <Footer key="Footer" />
+            </AnimatePresence>
           </main>
         </LocomotiveScrollProvider>
       </ThemeProvider>
-    </div>
+    </>
   );
 }
 
